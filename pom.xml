@@ -39,6 +39,10 @@
             <id>nuiton-releases</id>
             <name>nuiton Repository</name>
             <url>http://maven.nuiton.org/release/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
     </repositories>
 

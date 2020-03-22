@@ -24,6 +24,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
+import io.grpc.internal.DnsNameResolverProvider;
 import io.grpc.stub.AbstractStub;
 import me.samun.GreeterGrpc;
 import me.samun.HelloReply;
@@ -50,7 +51,10 @@ public final class HelloJsonClient {
 
   /** Construct client connecting to HelloWorld server at {@code host:port}. */
   public HelloJsonClient(String host, int port) {
-    channel = ManagedChannelBuilder.forAddress(host, port)
+
+    String target = "dns:///" + host + ":" + port;
+    channel = ManagedChannelBuilder.forTarget(target)
+            .nameResolverFactory(new DnsNameResolverProvider())
         .usePlaintext()
         .build();
     blockingStub = new HelloJsonStub(channel);
@@ -71,6 +75,7 @@ public final class HelloJsonClient {
       logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus());
       return;
     }
+    System.out.println("Greeting: " + response.getMessage());
     logger.info("Greeting: " + response.getMessage());
   }
 
@@ -80,7 +85,7 @@ public final class HelloJsonClient {
    */
   public static void main(String[] args) throws Exception {
     // Access a service running on the local machine on port 50051
-    HelloJsonClient client = new HelloJsonClient("localhost", 50051);
+    HelloJsonClient client = new HelloJsonClient("grpc.samun.me", 80);
     try {
       String user = "world";
       // Use the arg as the name to greet if provided
